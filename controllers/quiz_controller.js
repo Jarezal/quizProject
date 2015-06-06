@@ -14,7 +14,10 @@ exports.load = function(req, res, next, quizId) {
 
 //GET /quizes
 exports.index = function(req,res){
-        models.Quiz.findAll().then(function(quizes){
+        //Se añade filtro. Al ser una BD pequeña hacemos el like % cuando no venga el filtro por simplificar el código.
+        var filtro = req.query.search || ""
+        filtro = "%" + filtro.trim().toUpperCase().replace(/ /g,"%") + "%";
+        models.Quiz.findAll({where:["upper(pregunta) like ?",filtro], order:['pregunta']}).then(function(quizes){
             res.render('quizes/index', {quizes: quizes});
         }).catch(function(error) {next(error);}); 
 };
