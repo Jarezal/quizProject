@@ -18,13 +18,13 @@ exports.index = function(req,res){
         var filtro = req.query.search || ""
         filtro = "%" + filtro.trim().toUpperCase().replace(/ /g,"%") + "%";
         models.Quiz.findAll({where:["upper(pregunta) like ?",filtro], order:['pregunta']}).then(function(quizes){
-            res.render('quizes/index', {quizes: quizes});
+            res.render('quizes/index', {quizes: quizes, errors: []});
         }).catch(function(error) {next(error);}); 
 };
 
 //GET /quizes/:id
 exports.show = function(req,res){
-        res.render('quizes/show',{quiz: req.quiz});
+        res.render('quizes/show',{quiz: req.quiz, errors: []});
 };
 
 //GET /quizes/answer
@@ -35,7 +35,7 @@ exports.answer = function(req,res) {
     {
         resultado = 'Correcto';
     }
-    res.render('quizes/answer', {quiz: req.quiz, respuesta: resultado});
+    res.render('quizes/answer', {quiz: req.quiz, respuesta: resultado, errors: []});
     
 };
 
@@ -50,15 +50,28 @@ exports.new = function(req,res){
         {pregunta: "Pregunta", respuesta: "Respuesta"}
     );
     
-    res.render('quizes/new', {quiz: quiz});
+    res.render('quizes/new', {quiz: quiz, errors: []});
 };
 
 //POST /quizes/create
 exports.create = function(req,res){
     var quiz = models.Quiz.build(req.body.quiz);
     
-    //guarda en DB los campos pregunta y respuesta de quiz
-    quiz.save({fields: ["pregunta","respuesta"]}).then(function(){
+    var errores = quiz.validate();
+    
+    if(errores)
+    {
+        //necesario convertir el objeto errores a un array con propiedad message para que el layout lo muestre
+        var i = 0;
+        var erroresArray=new Array();
+        for (var j in errores) erroresArray[i++]={message: errores[j]}; 
+        res.render('quizes/new', {quiz: quiz, errors: erroresArray});
+    }
+    else
+    {
+        //guarda en DB los campos pregunta y respuesta de quiz
+        quiz.save({fields: ["pregunta","respuesta"]}).then(function(){
         res.redirect('/quizes');
-    }) //Redireccion HTTP (URL relativo) lista de preguntas
+    })} //Redireccion HTTP (URL relativo) lista de preguntas
+    
 };
