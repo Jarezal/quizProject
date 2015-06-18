@@ -12,7 +12,7 @@ exports.statistics = function(req,res){
             {
                 statistics.mediaComentarios = statistics.countComentarios / statistics.countPreguntas;
             }
-            models.sequelize.query('SELECT count(*) AS pregComm FROM "Quizzes" WHERE "id" IN (SELECT DISTINCT "QuizId" FROM "Comments")').then(function(countPregComm)
+            models.sequelize.query('SELECT count(*) AS "pregComm" FROM "Quizzes" WHERE "id" IN (SELECT DISTINCT "QuizId" FROM "Comments")').then(function(countPregComm)
             {
                 statistics.pregComm = countPregComm[0].pregComm;
                 statistics.pregNoComm = statistics.countPreguntas - statistics.pregComm;
