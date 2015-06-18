@@ -42,6 +42,28 @@ app.use(function(req,res,next){
     next();
 });   
 
+//Autologout
+app.use(function(req,res,next){
+   if(req.session.user)
+   {
+      var horaActual = new Date();
+      
+      if(req.session.lastTime)
+      {
+          console.log(horaActual.getTime());
+          console.log(req.session.lastTime);
+          //LastTime nos da la fecha en milisegundos, dividimos entre 1000 para obtener los segundos y comparar los 2 minutos.
+          if((horaActual.getTime() - req.session.lastTime)/1000 >= 120)
+          {
+            delete req.session.user;
+          }
+      }
+      req.session.lastTime = horaActual.getTime();
+   }
+   next();
+});
+
+
 app.use('/', routes);
 
 // catch 404 and forward to error handler
