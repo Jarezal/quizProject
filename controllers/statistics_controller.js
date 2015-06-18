@@ -14,7 +14,7 @@ exports.statistics = function(req,res){
             }
             models.sequelize.query('SELECT count(*) AS pregComm FROM "Quizzes" WHERE "id" IN (SELECT DISTINCT "QuizId" FROM "Comments")').then(function(countPregComm)
             {
-                statistics.pregComm = countPregComm[0].pregComm;
+                statistics.pregComm = countPregComm[0].pregComm || 0;
                 statistics.pregNoComm = statistics.countPreguntas - statistics.pregComm;
                 res.render('quizes/statistics.ejs',{statistics: statistics, errors:[]})
             })
